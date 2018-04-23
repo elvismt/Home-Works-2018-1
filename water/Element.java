@@ -52,7 +52,7 @@ public class Element implements Runnable {
         else {
             try {
                 Hsemaphore.acquire(2);
-                System.out.println("Made a water molecule #" + moleculeCount.addAndGet(1));
+                moleculeCount.incrementAndGet();
             } catch (InterruptedException exc) {
                 System.out.println("InterruptedException on oxygen");
             }

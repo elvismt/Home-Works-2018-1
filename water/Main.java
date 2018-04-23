@@ -37,7 +37,7 @@ public class Main {
         Semaphore Osemaphore = new Semaphore(0);
         AtomicInteger moleculeCount = new AtomicInteger(0);
 
-        for (int i = 0; i < 300; ++i) {
+        for (int i = 0; i < 300000; ++i) {
             Element element = new Element((i % 3) == 0 ? 'O' : 'H',
                                           Hsemaphore, Osemaphore, moleculeCount);
             Thread thread = new Thread(element);
@@ -52,5 +52,6 @@ public class Main {
                 System.out.println("Error on join()");
             }
         }
+        System.out.println("Total number of molecules created: " + moleculeCount.get());
     }
 }
