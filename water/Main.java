@@ -38,9 +38,9 @@ public class Main {
         AtomicInteger moleculeCount = new AtomicInteger(0);
 
         for (int i = 0; i < 300000; ++i) {
-            Element element = new Element((i % 3) == 0 ? 'O' : 'H',
-                                          Hsemaphore, Osemaphore, moleculeCount);
+            Element element = new Element((i % 3) == 0 ? 'O' : 'H', Hsemaphore, Osemaphore, moleculeCount);
             Thread thread = new Thread(element);
+            
             thread.setName("Thread " + String.valueOf(i));
             thread.start();
             threads.add(thread);

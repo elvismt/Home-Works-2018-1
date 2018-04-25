@@ -40,8 +40,8 @@ public class Element implements Runnable {
         // codigo executable por atomos de hidrogênio
         // observe a mudança na ordem de aquisição e sinalização
         // para evitar um deadlock imediato
-        Hsemaphore.release(1);
         if (this.type == 'H') {
+            Hsemaphore.release(1);
             try {
                 Osemaphore.acquire(1);
             } catch (InterruptedException exc) {
