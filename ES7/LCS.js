@@ -23,6 +23,7 @@ let arr = require('./array');
 
 
 let LCS = (X, Y) => {
+    // TODO: tracking is still buggy
     let m = X.shape[0];
     let n = Y.shape[0];
     let A = arr.zeros(m+1, n+1);
@@ -68,10 +69,6 @@ let LCS = (X, Y) => {
 };
 
 
-let res = LCS(arr.str('arrow'), arr.str('array'));
-
+let res = LCS(arr.str('AGGTAB'), arr.str('GXTXAYB'));
 console.log('Lengths:');
 arr.print(res.dists);
-
-console.log('Track:');
-arr.print(res.track);
