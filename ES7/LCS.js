@@ -23,22 +23,11 @@ let arr = require('./array');
 
 
 let LCS = (X, Y) => {
-    // TODO: tracking is still buggy
     let m = X.shape[0];
     let n = Y.shape[0];
     let A = arr.zeros(m+1, n+1);
     let T = arr.zeros(m+1, n+1);
 
-    // first row and column are filled with zeros
-    for (let i = 0; i < A.shape[0]; ++i) {
-        A[i][0] = 0;
-        T[i][0] = 'x';
-    }
-    for (let i = 0; i < A.shape[1]; ++i) {
-        A[0][i] = 0;
-        T[0][i] = 'x';
-    }
-    
     for (let i = 0; i < m; ++i) {
         for (let j = 0; j < n; ++j) {
             // interesting A indices are [1..m+1], [1..n+1]
@@ -55,11 +44,11 @@ let LCS = (X, Y) => {
             // PROPERTY 2: If the current characters are different
             //             then the LCS has the length of the
             //             maximum subsequence adding one of the chars
-            else if (A[ai][aj-1] > A[ai-1][aj]) {
-                A[ai][aj] = A[ai][aj-1];
+            else if (A[ai-1][aj] > A[ai][aj-1]) {
+                A[ai][aj] = A[ai-1][aj];
                 T[ai][aj] = '↑';
             } else {
-                A[ai][aj] = A[ai-1][aj];
+                A[ai][aj] = A[ai][aj-1];
                 T[ai][aj] = '←';
             }
         }
@@ -69,6 +58,29 @@ let LCS = (X, Y) => {
 };
 
 
-let res = LCS(arr.str('AGGTAB'), arr.str('GXTXAYB'));
+function print_LCS(track, X, i, j) {
+    // from Cormen
+    if (i == 0 || j == 0) {
+        return;
+    }
+    if (track[i][j] == '↖') {
+        print_LCS(track, X, i-1, j-1);
+        console.log(X[i-1]);
+    } else if (track[i][j] == '↑') {
+        print_LCS(track, X, i-1, j);
+    } else {
+        print_LCS(track, X, i, j-1);
+    }
+}
+
+
+let X = arr.str('AGGTAB');
+let Y = arr.str('GXTXAYB');
+let lcs = LCS(X, Y);
 console.log('Lengths:');
-arr.print(res.dists);
+arr.print(lcs.dists);
+
+console.log('Track:');
+arr.print(lcs.track);
+
+print_LCS(lcs.track, X, lcs.track.shape[0]-1, lcs.track.shape[1]-1);
