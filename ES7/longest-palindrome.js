@@ -25,16 +25,17 @@ let arr = require('./array');
 function longestPalindrome(S) {
     const n = S.length;
     let M = arr.zeros(n, n);
+    let bounds = {};
 
     // All one-character strings are a 1-palindrome
     for (let i = 0; i < n; ++i) {
         M[i][i] = 1;
     }
 
-    for (let l = 2; l < n; ++l) {
+    for (let l = 2; l <= n; ++l) {
         for (let i = 0; i < (n - l + 1); ++i) {
             let j = i + l - 1;
-
+            
             // A two-character string with two identical chars is a 2-palindrome
             if (S[i] == S[j] && l == 2) {
                 M[i][j] = 2;
@@ -43,6 +44,8 @@ function longestPalindrome(S) {
             // in relation to that of the same string without the ends
             else if (S[i] == S[j]) {
                 M[i][j] = M[i+1][j-1] + 2;
+                bounds.start = i;
+                bounds.end = j;
             }
             // else, it is Math.max(M[i+1][j] , M[i][j-1])
             else if (M[i+1][j] > M[i][j-1]) {
@@ -54,8 +57,10 @@ function longestPalindrome(S) {
         }
     }
 
-    return M;
+    return { M, bounds };
 }
 
 
-arr.print(longestPalindrome('BABCBAB'));
+res = longestPalindrome('BABCBAB');
+arr.print(res.M);
+console.log(res.bounds);
