@@ -19,39 +19,43 @@
 // FROM, OUT OF OR IN  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-const util = require('util');
+let arr = require('./array');
 
-module.exports.zeros = function(ax1, ax2) {
-    if (ax1 && ax2) {
-        let array = new Array(ax1);
-        for(let i=0; i < ax1; i++) {
-            array[i] = new Array(ax2);
-            for(let j=0; j < ax2; j++)
-                array[i][j] = 0.0;
-        }
-        array.shape = [ax1, ax2];
-        return array;
-    } else if (ax1) {
-        array = new Array(ax1);
-        for(let j=0; j < ax1; j++)
-            array[j] = 0.0;
-        array.shape = [ax1];
-        return array;
-    } else {
-        throw new Error("zeros(): Invalid array size");
+
+function longestPalindrome(S) {
+    const n = S.length;
+    let M = arr.zeros(n, n);
+
+    // All one-character strings are a 1-palindrome
+    for (let i = 0; i < n; ++i) {
+        M[i][i] = 1;
     }
-};
 
+    for (let l = 2; l < n; ++l) {
+        for (let i = 0; i < (n - l + 1); ++i) {
+            let j = i + l - 1;
 
-module.exports.print = function(obj) {
-    console.log(util.inspect(obj, false, null));
+            // A two-character string with two identical chars is a 2-palindrome
+            if (S[i] == S[j] && l == 2) {
+                M[i][j] = 2;
+            }
+            // If chars at [i] and [j], the length of the palindrome increases by 2
+            // in relation to that of the same string without the ends
+            else if (S[i] == S[j]) {
+                M[i][j] = M[i+1][j-1] + 2;
+            }
+            // else, it is Math.max(M[i+1][j] , M[i][j-1])
+            else if (M[i+1][j] > M[i][j-1]) {
+                M[i][j] = M[i+1][j];
+            }
+            else {
+                M[i][j] = M[i][j-1];
+            }
+        }
+    }
+
+    return M;
 }
 
 
-module.exports.str = function(s) {
-    let arr = new Array(s.length);
-    for (let i = 0; i < arr.length; ++i)
-        arr[i] = s[i];
-    arr.shape = [arr.length];
-    return arr;
-}
+arr.print(longestPalindrome('BABCBAB'));

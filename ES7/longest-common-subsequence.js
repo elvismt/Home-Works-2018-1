@@ -22,9 +22,9 @@
 let arr = require('./array');
 
 
-let LCS = (X, Y) => {
-    let m = X.shape[0];
-    let n = Y.shape[0];
+function longestCommonSubsequence(X, Y) {
+    const m = X.shape[0];
+    const n = Y.shape[0];
     let A = arr.zeros(m+1, n+1);
     let T = arr.zeros(m+1, n+1);
 
@@ -58,29 +58,29 @@ let LCS = (X, Y) => {
 };
 
 
-function print_LCS(track, X, i, j) {
+function printLCS(track, X, i, j) {
     // from Cormen
     if (i == 0 || j == 0) {
         return;
     }
     if (track[i][j] == '↖') {
-        print_LCS(track, X, i-1, j-1);
+        printLCS(track, X, i-1, j-1);
         console.log(X[i-1]);
     } else if (track[i][j] == '↑') {
-        print_LCS(track, X, i-1, j);
+        printLCS(track, X, i-1, j);
     } else {
-        print_LCS(track, X, i, j-1);
+        printLCS(track, X, i, j-1);
     }
 }
 
 
 let X = arr.str('AGGTAB');
 let Y = arr.str('GXTXAYB');
-let lcs = LCS(X, Y);
+let lcs = longestCommonSubsequence(X, Y);
 console.log('Lengths:');
 arr.print(lcs.dists);
 
 console.log('Track:');
 arr.print(lcs.track);
 
-print_LCS(lcs.track, X, lcs.track.shape[0]-1, lcs.track.shape[1]-1);
+printLCS(lcs.track, X, lcs.track.shape[0]-1, lcs.track.shape[1]-1);
