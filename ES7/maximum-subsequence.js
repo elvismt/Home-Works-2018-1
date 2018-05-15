@@ -19,47 +19,37 @@
 // FROM, OUT OF OR IN  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-const util = require('util');
+"use-strict";
+let arr = require('./array');
 
-module.exports.makeN = function(ax1, ax2, value) {
-    if (ax1 && ax2) {
-        let array = new Array(ax1);
-        for(let i=0; i < ax1; i++) {
-            array[i] = new Array(ax2);
-            for(let j=0; j < ax2; j++)
-                array[i][j] = value || 0.0;
+function maxSubseq(sequence) {
+    const n = sequence.length;
+    let maxSoFar = 0.0;
+    let maxEndingHere = 0.0;
+    let start = 0, end = 0;
+    
+    for (let i = 0; i < n; ++i) {
+        
+        // Remembers the sum of the current subsequence
+        // ensing in this position
+        maxEndingHere += sequence[i];
+
+        // If the sum ending here is greater than the
+        // recorded maxium, update the maximum
+        if (maxEndingHere > maxSoFar) {
+            maxSoFar = maxEndingHere;
+            end = i;
         }
-        array.shape = [ax1, ax2];
-    } else if (ax1) {
-        array = new Array(ax1);
-        for(let j=0; j < ax1; j++)
-            array[j] = value || 0.0;
-        array.shape = [ax1];
-    } else {
-        throw new Error("ndarray: Invalid array size");
+
+        // If the becomes negative we should start the search
+        // again from this position
+        if (maxEndingHere < 0.0) {
+            maxEndingHere = 0.0;
+            start = i + 1;
+        }
     }
-};
 
-
-module.exports.zeros = function(ax1, ax2) {
-    return module.exports.makeN(ax1, ax2, 0.0);
+    return { maxSum: maxSoFar, start, end };
 }
 
-
-module.exports.ones = function(ax1, ax2) {
-    return module.exports.makeN(ax1, ax2, 1.0);
-}
-
-
-module.exports.print = function(obj) {
-    console.log(util.inspect(obj, false, null));
-}
-
-
-module.exports.str = function(s) {
-    let arr = new Array(s.length);
-    for (let i = 0; i < arr.length; ++i)
-        arr[i] = s[i];
-    arr.shape = [arr.length];
-    return arr;
-}
+console.log(maxSubseq([-2, -3, 4, -1, -2, 1, 5, -3]))
