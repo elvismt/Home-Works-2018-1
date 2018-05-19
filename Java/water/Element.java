@@ -24,39 +24,47 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Element implements Runnable {
     private char type;
-    private Semaphore Hsemaphore;
-    private Semaphore Osemaphore;
-    private AtomicInteger moleculeCount;
+    private Semaphore mutex;
+    private Semaphore Hwait;
+    private Semaphore Owait;
+    private AtomicInteger Hcount;
+    private AtomicInteger H2Ocount;
 
-    Element(char type, Semaphore Hsemaphore, Semaphore Osemaphore, AtomicInteger moleculeCount) {
+    Element(char type, Semaphore mutex, Semaphore Hwait, Semaphore Owait,
+            AtomicInteger Hcount, AtomicInteger H2Ocount) {
         this.type = type;
-        this.Hsemaphore = Hsemaphore;
-        this.Osemaphore = Osemaphore;
-        this.moleculeCount = moleculeCount;
+        this.mutex = mutex;
+        this.Hwait = Hwait;
+        this.Owait = Owait;
+        this.Hcount = Hcount;
+        this.H2Ocount = H2Ocount;
     }
 
     @Override
     public void run() {
-        // codigo executable por atomos de hidrogênio
-        // observe a mudança na ordem de aquisição e sinalização
-        // para evitar um deadlock imediato
-        if (this.type == 'H') {
-            Hsemaphore.release(1);
-            try {
-                Osemaphore.acquire(1);
-            } catch (InterruptedException exc) {
-                System.out.println("InterruptedException on hydrogen");
+        try {
+            // Código executado por átomos de hidrogênio
+            if (this.type == 'H') {
+                mutex.acquire(1);
+                Hcount.incrementAndGet();
+                if (Hcount.get() % 2 == 1) {
+                    mutex.release(1);
+                    Hwait.acquire(1);
+                } else {
+                    Owait.release(1);
+                    Hwait.acquire(1);
+                    mutex.release(1);
+                }
             }
-        }
-        // codigo executable por atomos de oxigênio
-        else {
-            try {
-                Hsemaphore.acquire(2);
-                moleculeCount.incrementAndGet();
-            } catch (InterruptedException exc) {
-                System.out.println("InterruptedException on oxygen");
+            // Código executado por átomos de oxigênio
+            else {
+                Owait.acquire(1);
+                Hwait.release(2);
+                H2Ocount.incrementAndGet();
             }
-            Osemaphore.release(2);
+        } catch (Exception exc) {
+            System.out.println(exc);
         }
     }
 }
+

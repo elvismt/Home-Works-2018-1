@@ -24,21 +24,23 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Esta é uma implementação da solução o problema da
- * criação concorrente de moléculas de água do livro
- * "Little Book of Semaphores" de Allen B. Downey.
- */
+// Esta é uma implementação da solução o problema da
+// criação concorrente de moléculas de água do livro
+// "Little Book of Semaphores" de Allen B. Downey.
 public class Main {
     
     public static void main(String[] args) {
         List<Thread> threads = new ArrayList<Thread>();
-        Semaphore Hsemaphore = new Semaphore(0);
-        Semaphore Osemaphore = new Semaphore(0);
-        AtomicInteger moleculeCount = new AtomicInteger(0);
+        Semaphore mutex = new Semaphore(1);
+        Semaphore Hwait = new Semaphore(0);
+        Semaphore Owait = new Semaphore(0);
+        AtomicInteger Hcount = new AtomicInteger(0);
+        AtomicInteger H2Ocount = new AtomicInteger(0);
 
-        for (int i = 0; i < 300000; ++i) {
-            Element element = new Element((i % 3) == 0 ? 'O' : 'H', Hsemaphore, Osemaphore, moleculeCount);
+        for (int i = 0; i < 300; ++i) {
+            Element element = new Element(
+                    (i % 3) == 0 ? 'O' : 'H',
+                    mutex, Hwait, Owait, Hcount, H2Ocount);
             Thread thread = new Thread(element);
             
             thread.setName("Thread " + String.valueOf(i));
@@ -48,10 +50,13 @@ public class Main {
         for (Thread thread : threads) {
             try {
                 thread.join();
-            } catch (Exception ex) {
-                System.out.println("Error on join()");
+            } catch (Exception exc) {
+                System.out.println("Error on join():");
+                System.out.println(exc);
             }
         }
-        System.out.println("Total number of molecules created: " + moleculeCount.get());
+        System.out.println("Molecules created: " + H2Ocount.get());
+        System.out.println("Hidrogens used: " + Hcount.get());
     }
 }
+
